@@ -8,6 +8,12 @@
 <h3></h3>
  
 ---
+### Tristan Notes
+
+**Approach**: I first implemented the API call in my data component. I accomplished this using "fetch" and some basic state variables for the data and whether or not it was loading. Once I had the call working, I decided to create some interfaces for the data so I could easily and safely access it the component later on. I created a ApiResponse, Record, and Error interface. With those working, I then quickly setup a table to display the data. I decided to use tailwind for speed and ease-of-use. After I had the basic display up, I focused on the conditional formatting section. To accomplish this, I wrote a basic function that input a record, and output a conditionally formatted cell element depending on the record values. For the tooltip, I decided to utilize MaterialUI once again for speed and ease-of-use. For the CSV export, I candidly did some searching and found a basic solution utilizing blob and some basic row parsing. Lastly, for the error modal, I decided to continue using MaterialUI and utilized their basic Button/Modal components. 
+
+**Improvements**: Firstly, with more time I would dedicate cycles to the UI/UX. It's not exactly very aesthetic or pretty as it stands. I'd like to change the fonts, make the coloring and button more uniform, and add some addition text explaining the features on the page. Furthermore, I'd like to add pagination, more robust conditional formatting, and additional options for export. 
+
 
 ### **Take-Home Assignment: Data Review, Editor, and Exporter**
 
