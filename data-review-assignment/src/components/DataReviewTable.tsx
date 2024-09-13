@@ -5,6 +5,7 @@ import { Button, Modal, Box, Typography, Tooltip } from '@mui/material';
 
 export default function DataReviewTable() {
 
+    /* Errors attached to each row */
     interface Errors {
         [key: string]: {
             message: string;
@@ -12,6 +13,7 @@ export default function DataReviewTable() {
         };
     }
 
+    /* Record corresponds to one row */
     interface Record {
         id: number;
         name: string;
@@ -24,6 +26,7 @@ export default function DataReviewTable() {
         errors: Errors;
     }
 
+    /* Expected response from Data endpoint */
     interface ApiResponse {
         records: Record[];
     }
@@ -34,7 +37,7 @@ export default function DataReviewTable() {
     const [selectedErrors, setSelectedErrors] = useState<Errors | null>(null); // Store selected row's errors
 
 
-    // Fetch data from API
+    /* Fetch Recrods from API */
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -52,22 +55,31 @@ export default function DataReviewTable() {
         fetchData();
     }, []);
 
+    /* Loading display */
     if (loading) {
         return <div>Loading...</div>;
     }
 
+    /* Modal handlers */
     const handleOpenModal = (errors: Errors) => {
         setSelectedErrors(errors);
         setOpenModal(true);
     };
-
     const handleCloseModal = () => {
         setOpenModal(false);
         setSelectedErrors(null);
     };
 
+    /* Returns a formatted td cell depending on record values */
     const cellFormatter = (record: Record, field: keyof Record) => {
-        const errors = record.errors
+        const errors = record.errors;
+        const value = record[field];
+        /* Ensure that value is non-Error property */
+        if (typeof value === 'object' && value !== null && 'message' in value && 'severity' in value) {
+            console.log("Unable to format error");
+            return <td></td>
+        }
+
         if (field in errors) {
             const getBackgroundColor = (severity: string) => {
                 if (severity === 'warning') return 'bg-yellow-400 bg-opacity-50';
@@ -77,20 +89,21 @@ export default function DataReviewTable() {
             const errorMessage = errors[field].message;
             return (
                 <Tooltip title={errorMessage} arrow>
-                    <td className={`px-6 py-4 text-gray-800 bg-opacity-50 ${backgroundColor}`}>
-                        {record[field]}
+                    <td className={`px-6 py-4 text-gray-800 bg-opacity-80 ${backgroundColor}`}>
+                        {value as string | number}
                     </td>
                 </Tooltip>
             )
         } else {
             return (
-                <td className="px-6 py-4 text-gray-800 bg-green-600 bg-opacity-20">
-                    {record[field]}
+                <td className="px-6 py-4 text-gray-800 bg-green-600 bg-opacity-60">
+                    {value as string | number}
                 </td>
             )
         }
     }
 
+    /* Function to export Records to a csv blob */
     const exportToCSV = (data: Record[], filename: string) => {
         const csvRows = [];
             const headers = Object.keys(data[0]);
@@ -102,8 +115,6 @@ export default function DataReviewTable() {
             });
             csvRows.push(values.join(','));
         }
-    
-        // Create a Blob from the CSV rows
         const csvBlob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
         const url = window.URL.createObjectURL(csvBlob);
         const a = document.createElement('a');
@@ -118,18 +129,23 @@ export default function DataReviewTable() {
     };
 
     return (
-        <div className="mx-auto">
+        <div className="mx-auto bg-gray-100">
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <div className="pt-3 flex justify-center items-center gap-3">
-                    <h1 className="text-3xl font-bold text-gray-700">Data Review Table</h1>
-                    <Button variant="outlined" color="primary" onClick={handleExportCSV}>
+                    <h1 className="text-3xl font-bold text-gray-600">Data Review Table</h1>
+                    <Button variant="contained" color="primary" onClick={handleExportCSV}>
                         Export to CSV
                     </Button>
                 </div>
-                <div className="py-6 flex items-center justify-center">
-                    <table className="shadow-lg rounded-lg w-2/3 text-sm text-left rtl:text-right text-gray-400">
+                <div className="pt-3 flex justify-center items-center text-grety-600">
+                    <p>
+                        Welcome to your custom data validator! Hover over a invalid cell to understand the error. 
+                    </p>
+                </div>
+                <div className="py-6 flex items-center justify-center rounded-lg">
+                    <table className="shadow-lg rounded-lg w-2/3 text-sm text-left rtl:text-right text-gray-200">
                         <thead className="text-xs uppercase bg-gray-700 text-gray-200">
-                            <tr className="border-b-2 border-gray-900">
+                            <tr className="border-b-2 border-gray-500">
                                 <th scope="col" className="px-6 py-3">
                                     Name
                                 </th>
